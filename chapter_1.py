@@ -42,7 +42,7 @@ class MyModule:
     ):
         # Extra information about def
         T.func_attr({"global_symbol": "mm_relu", "tir.noalias": True})
-        Y = T.allocate_buffer((128, 128), dtype="float32")
+        Y = T.alloc_buffer((128, 128), dtype="float32")
 
         # Grammar sugar for writing many loops
         for i, j, k in T.grid(128, 128, 128):
@@ -68,4 +68,4 @@ class MyModule:
         for i, j in T.grid(128, 128):
             with T.block("C"):
                 vi, vj = T.axis.remap("SS", [i, j])
-                C[vi, vj] = max(Y[vi, vj], T.float32(0))
+                C[vi, vj] = T.max(Y[vi, vj], T.float32(0))
