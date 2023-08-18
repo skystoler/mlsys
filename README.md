@@ -11,4 +11,17 @@ Common compilation and installtion of standard tvm:
     4. set env:
         export TVM_HOME=/path/to/tvm
         export PYTHONPATH=$TVM_HOME/python:$TVM_HOME/topi/python:$TVM_HOME/nnvm/python:${PYTHONPATH}
-    5. pip3 install IPython && synr
+    
+Requirements:
+    python >= 3.7
+    torchvision
+    torch
+    numpy
+    matplotlib
+    LLVM
+    CUDA
+    IPython
+    
+We here provide some commands may be helpful:    
+    1. IPython && synr: pip3 install IPython && synr
+    2. LLVM: wget https://apt.llvm.org/llvm.sh; sudo ./llvm.sh 13
