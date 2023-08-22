@@ -117,6 +117,7 @@ def from_fx(fx_mod, input_shapes, call_function_map, call_module_map):
     fn_output = None
     with bb.function("main"):
         with bb.dataflow():
+            # Nodes here are sorted in a reverse topology order
             for node in fx_mod.graph.nodes:
                 if node.op == "placeholder":
                     # create input placeholder
@@ -128,6 +129,7 @@ def from_fx(fx_mod, input_shapes, call_function_map, call_module_map):
                     fn_inputs.append(input_var)
                     node_map[node] = input_var
                 elif node.op == "get_attr":
+                    # We get fx.node.weight by fetch_attr here
                     node_map[node] = map_param(fetch_attr(fx_mod, node.target))
                 elif node.op == "call_function":
                     node_map[node] = call_function_map[node.target](bb, node_map, node)
