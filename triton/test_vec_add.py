@@ -58,7 +58,7 @@ if __name__ == '__main__':
     y = torch.rand(size, device = 'cuda')
     output_torch = x + y
     output_triton = add(x, y)
-    assert output_torch == output_triton
+    assert torch.allclose(output_torch, output_triton)
 
     # (To do) Should learn how it works: https://github.com/triton-lang/triton/blob/main/python/triton/testing.py#L84
     benchmark.run(print_data = True, show_plots = True)
