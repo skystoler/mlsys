@@ -176,12 +176,12 @@ def benchmark(M, N, K, provider):
     return perf(ms), perf(max_ms), perf(min_ms)
 
 if __name__ == '__main__':
-    a = torch.randn((512, 512), device = 'cuda', dtype = torch.float16)
-    b = torch.randn((512, 512), device = 'cuda', dtype = torch.float16)
+    a = torch.randn((512, 512), device='cuda', dtype=torch.float16)
+    b = torch.randn((512, 512), device='cuda', dtype=torch.float16)
     triton_output = matmul(a, b)
     torch_output = torch.matmul(a, b)
     # absolute tolerance (atol): absolute(a - b) <= atol
     # relative tolerance (rtol): absolute(a - b) <= rtol * absolute(b)
-    assert torch.allclose(triton_output, torch_output, atol = 1e-2, rtol = 0)
+    assert torch.allclose(triton_output, torch_output, atol=1e-2, rtol=0)
 
     benchmark.run(show_plots=True, print_data=True)

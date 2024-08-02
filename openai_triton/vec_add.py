@@ -9,14 +9,14 @@ def add_kernel(x_ptr,
                n_elements, # Size of vector
                BLOCK_SIZE: tl.constexpr, # Each program should handle the number of elements
                ): 
-    pid = tl.program_id(axis = 0) # We use one dimension here, so axis = 0
+    pid = tl.program_id(axis=0) # We use one dimension here, so axis = 0
     block_start = pid * BLOCK_SIZE
     offset = block_start + tl.arange(0, BLOCK_SIZE) # Offset is a list of pointers
     mask = offset < n_elements # Mask to avoid access out of range
-    x = tl.load(x_ptr + offset, mask = mask)
-    y = tl.load(y_ptr + offset, mask = mask)
+    x = tl.load(x_ptr + offset, mask=mask)
+    y = tl.load(y_ptr + offset, mask=mask)
     output = x + y
-    tl.store(output_ptr + offset, output, mask = mask)
+    tl.store(output_ptr + offset, output, mask=mask)
 
 def add(x: torch.Tensor, y: torch.Tensor):
     output = torch.empty_like(x)
@@ -54,11 +54,11 @@ def benchmark(size, provider):
 
 if __name__ == '__main__':
     size = 38240
-    x = torch.rand(size, device = 'cuda')
-    y = torch.rand(size, device = 'cuda')
+    x = torch.rand(size, device='cuda')
+    y = torch.rand(size, device='cuda')
     output_torch = x + y
     output_triton = add(x, y)
     assert torch.allclose(output_torch, output_triton)
 
     # (To do) Should learn how it works: https://github.com/triton-lang/triton/blob/main/python/triton/testing.py#L84
-    benchmark.run(print_data = True, show_plots = True)
+    benchmark.run(print_data=True, show_plots=True)

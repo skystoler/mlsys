@@ -77,8 +77,8 @@ def softmax(x):
                    x.stride(0), 
                    y.stride(0), 
                    n_cols, 
-                   num_warps = num_warps,
-                   BLOCK_SIZE = BLOCK_SIZE
+                   num_warps=num_warps,
+                   BLOCK_SIZE=BLOCK_SIZE
                    )
     return y
 
