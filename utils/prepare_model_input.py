@@ -1,6 +1,6 @@
 import pickle
 import torch
-from data import PICKLE_PATH
+from utils.data import PICKLE_PATH
 
 def load_input_from_pickle_to_device(device):
     images_t, masks_t, token_ids_t = simple_load_input_from_pickle()
