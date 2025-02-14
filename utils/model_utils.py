@@ -37,6 +37,20 @@ def get_torchscript_input_shapes(model_name):
         else:
             print(f"Input '{inp.debugName()}' is not a tensor")
 
+
+def get_model_mb_size(model):
+    param_size = 0
+    for param in model.parameters():
+        param_size += param.nelement() * param.element_size()
+    buffer_size = 0
+    for buffer in model.buffers():
+        buffer_size += buffer.nelement() * buffer.element_size()
+
+    size_all_mb = (param_size + buffer_size) / 1024**2
+    print('model size: {:.3f}MB'.format(size_all_mb))
+    return size_all_mb
+
+
 # Usage
 if __name__ == '__main__':
     #model_name = "http://version-control-test.oss-cn-hangzhou-zmf.aliyuncs.com/temp%2Fmodels%2Fdoc_beit%2Fframeless_table%2Fai_doc_table%2F1126%2Fcheckpoint-157-best_AiDocTable0823_ser_link_f1_score_98.08_tr.pth"

@@ -2,12 +2,14 @@ import pickle
 import torch
 from utils.data import PICKLE_PATH
 
+
 def load_input_from_pickle_to_device(device):
     images_t, masks_t, token_ids_t = simple_load_input_from_pickle()
     images_t = images_t.to(device)
     masks_t = masks_t.to(device)
     token_ids_t = token_ids_t.to(device)
     return images_t, masks_t, token_ids_t
+
 
 def simple_load_input_from_pickle():
     with open(PICKLE_PATH, 'rb') as pickle_file:
