@@ -166,7 +166,7 @@ def get_can_use_cache(first_hidden_states_residual,
     else:
         cache_context.use_cache = can_use_cache
         if validation_function is not None:
-            if scheduler_step:
+            if scheduler_step is not None:
                 can_use_cache, is_seg_end = validation_function(can_use_cache, scheduler_step)
             else:
                 can_use_cache = validation_function(can_use_cache)
@@ -809,15 +809,16 @@ def create_patch_flux_forward_orig(model,
             if i == 0:
                 first_hidden_states_residual = img
                 if isinstance(residual_diff_threshold, list):
-                    nonlocal scheduler_step
+                    #nonlocal scheduler_step
                     can_use_cache, is_seg_end = get_can_use_cache(
                         first_hidden_states_residual,
                         threshold=residual_diff_threshold[scheduler_step],
                         validation_function=validate_can_use_cache_function,
-                        scheduler_step=scheduler_step
-                    )
-                    if is_seg_end:
-                        scheduler_step = scheduler_step + 1
+                        #scheduler_step=scheduler_step
+                        scheduler_step=0,
+                    )                 
+                    # if is_seg_end:
+                    #     scheduler_step = scheduler_step + 1
                 else:
                     can_use_cache, _ = get_can_use_cache(
                         first_hidden_states_residual,

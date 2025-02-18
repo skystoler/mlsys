@@ -23,7 +23,7 @@ class FBScheduler:
                     "STRING",
                     {
                         "default":
-                        "0.0,0.0,1.0,-1",
+                        "0.12,0.0,0.5,2;0.15,0.5,1.0,3",
                         "tooltip":
                         "Allow users to custome FBcache." 
                     },
@@ -58,15 +58,20 @@ class FBScheduler:
     ):  
         first_block_cache.patch_get_output_data()
 
-        fbconfig =self.parse_scheduler(scheduler)
+        fbconfig = self.parse_scheduler(scheduler)
         using_validation = True
-        for idx in range(len(fbconfig) - 1):
-            cur_config, next_config  = fbconfig[idx], fbconfig[idx + 1]
+        config_length = len(fbconfig)
+        for idx in range(config_length):
+            cur_config = fbconfig[idx]
+            next_config = fbconfig[idx + 1] if idx < config_length - 1 else None
             residual_diff_threshold, start, end, max_consecutive_cache_hits = cur_config
-            if residual_diff_threshold <= 0.0 or max_consecutive_cache_hits == 0 or len(cur_config) != 4 or end > next_config[0]:
-                return (model, )
-            if max_consecutive_cache_hits < 0 or start <= 0 or end >= 1:
+            if max_consecutive_cache_hits < 0 and start <= 0 and end >= 1:
                 using_validation = False
+            if residual_diff_threshold <= 0.0 or max_consecutive_cache_hits == 0 or len(cur_config) != 4:
+                return (model, )
+            if next_config is not None and end > next_config[0]:
+                return (model, )
+
         
         if using_validation:
             model_sampling = model.get_model_object("model_sampling")
