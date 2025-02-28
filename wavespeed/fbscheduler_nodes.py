@@ -69,7 +69,7 @@ class FBScheduler:
                 using_validation = False
             if residual_diff_threshold <= 0.0 or max_consecutive_cache_hits == 0 or len(cur_config) != 4:
                 return (model, )
-            if next_config is not None and end > next_config[0]:
+            if next_config is not None and end > next_config[1]:
                 return (model, )
 
         
@@ -151,7 +151,7 @@ class FBScheduler:
 
             patch_forward = create_patch_function(
                 diffusion_model,
-                residual_diff_threshold=[config[1] for config in fbconfig],
+                residual_diff_threshold=[config[0] for config in fbconfig],
                 validate_can_use_cache_function=validate_use_cache,
             )
 
@@ -217,7 +217,7 @@ class FBScheduler:
                         diffusion_model, double_blocks_name),
                     None if single_blocks_name is None else getattr(
                         diffusion_model, single_blocks_name),
-                    residual_diff_threshold=residual_diff_threshold,
+                    residual_diff_threshold=[config[0] for config in fbconfig],
                     validate_can_use_cache_function=validate_use_cache,
                     cat_hidden_states_first=diffusion_model.__class__.__name__
                     == "HunyuanVideo",
