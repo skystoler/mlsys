@@ -106,7 +106,7 @@ class MPDistRunner:
                         shared_array,
                         input_queue if rank == 0 else None,
                         output_queue if rank == 0 else None,
-                        exception_queues[rank] if rank == 0 else None,
+                        exception_queues[rank],
                         status if rank == 0 else None,
                     ),
                     daemon=True,
@@ -114,11 +114,36 @@ class MPDistRunner:
                 process.start()
                 processes.append(process)
 
-            output_queue.get(timeout=timeout)
             exceptions = []
-            for rank, exception_queue in enumerate(exception_queues):
-                if not exception_queue.empty():
-                    exceptions.append((rank, exception_queue.get()))
+            begin_time = time.time()
+            while True:
+                if timeout is not None and time.time() - begin_time >= timeout:
+                    raise RuntimeError("Timeout occurred")
+                for rank, (process, exception_queue) in enumerate(zip(processes, exception_queues)):
+                    if process.is_alive():
+                        if exception_queue.empty():
+                            continue
+                        else:
+                            exception = exception_queue.get()
+                            if exception is None:
+                                exceptions.append(None)
+                            else:
+                                exceptions.append((rank, exception))
+                    else:
+                        if exception_queue.empty():
+                            exceptions.append((rank, RuntimeError(f"Process {rank} is not alive")))
+                        else:
+                            exception = exception_queue.get()
+                            if exception is None:
+                                exceptions.append(
+                                    (rank, RuntimeError(f"Process {rank} is not alive after initialization"))
+                                )
+                            else:
+                                exceptions.append((rank, exception))
+                if len(exceptions) == world_size or any(e is not None for e in exceptions):
+                    break
+                time.sleep(0.0)
+            exceptions = [e for e in exceptions if e is not None]
             if exceptions:
                 msg = "\n".join(f"Rank {rank}: {exception}" for rank, exception in exceptions)
                 raise RuntimeError(f"Exceptions occurred:\n{msg}")
@@ -245,9 +270,12 @@ class MPDistRunner:
                 exception = RuntimeError(f"Failed to initialize processor: {e}\n{traceback.format_exc()}")
                 if exception_queue is not None:
                     exception_queue.put(exception)
-            barrier.wait()
-            if output_queue is not None:
-                output_queue.put(True)
+                # raise
+                while True:
+                    time.sleep(0.0)
+
+            if exception_queue is not None:
+                exception_queue.put(None)
 
             while True:
                 if input_queue is None:

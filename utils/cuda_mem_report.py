@@ -113,13 +113,11 @@ def analyze_snapshot(snapshot_path):
         snapshot = pickle.load(f)
         
     # 分析分配记录
-    for seg in snapshot.keys():
-        print(f"时间范围: {seg.begin_time_ns} - {seg.end_time_ns}")
-        for alloc in seg.allocations:
-            print(f"分配 {alloc.size} bytes at {alloc.device}")
-            print(f"堆栈跟踪:\n{alloc.traceback}")
+    for seg in snapshot['segments']:
+        print(seg.keys())
+        print(f"分配 {seg['allocated_size']} bytes 在设备 {seg['device']}")
 
 if __name__ == "__main__":
-    #run_model_inference()
-    analyze_snapshot("snapshot.pickle")
-    #save_output(output_filename="snapshot.pickle")
+    run_model_inference()
+    # analyze_snapshot("snapshot.pickle")
+    save_output(output_filename="snapshot.pickle")
